@@ -1,6 +1,6 @@
 {
   "name": "unchain",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "github tag-and-release tool",
   "main": "unchain",
   "scripts": {
@@ -13,7 +13,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/d4lton/unchain.git",
+    "url": "https://github.com/d4lton/unchain.git"
   },
   "author": "Dana Basken",
   "license": "MIT",
