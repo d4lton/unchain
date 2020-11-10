@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 
+const args = require('minimist')(process.argv.slice(2));
 const fetch = require('node-fetch');
 const fs = require('fs');
 const git = require('simple-git')();
 const package = require('./package.json');
+
+const branches = ['main', 'master', 'develop'];
 
 // TODO: make sure branch is develop or master (configurable)
 // TODO: make sure branch is clean
@@ -13,12 +16,35 @@ const package = require('./package.json');
 // TODO: create github release
 // TODO: upload release artifact (if any)
 
+function usage(message) {
+  console.log('');
+  console.log(`${package.name} v${package.version}`);
+  console.log('');
+  if (message) {
+    console.log(`  ${message}`);
+    console.log('');
+  }
+  console.log('usage: unchain');
+  console.log('');
+  process.exit(1);
+}
+
 (async () => {
+
   await git.init();
+
+  const branch = await git.branch();
+  if (!branches.includes(branch.current)) { usage(`must be on one of these branches: ${branches.join(', ')}`) }
+
+  const status = await git.status();
+  console.log(status);
+  if (status.ahead || status.behind || status.staged.length || status.files.length) { usage(`branch is not clean`) }
+
   const tags = await git.tags();
+
   console.log(tags.latest);
   const logs = await git.log({from: tags.latest, to: 'HEAD'});
-  console.log(logs);
-  // git describe --tags --abbrev=0
+  console.log(logs.all.map(it => it.message));
+
 })();
 
