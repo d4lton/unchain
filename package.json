@@ -1,6 +1,6 @@
 {
   "name": "unchain",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "github tag-and-release tool",
   "main": "unchain",
   "scripts": {
