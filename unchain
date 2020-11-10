@@ -14,11 +14,9 @@ const package = require('./package.json');
 // TODO: upload release artifact (if any)
 
 (async () => {
-  console.log('hi');
   await git.init();
-  const stuff = await git.tags();
-  console.log(stuff);
-
-// git describe --tags --abbrev=0
+  const tags = await git.tags();
+  console.log(tags);
+  // git describe --tags --abbrev=0
 })();
 
