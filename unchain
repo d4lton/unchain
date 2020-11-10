@@ -16,7 +16,9 @@ const package = require('./package.json');
 (async () => {
   await git.init();
   const tags = await git.tags();
-  console.log(tags);
+  console.log(tags.latest);
+  const logs = await git.log({from: tags.latest, to: 'HEAD'});
+  console.log(logs);
   // git describe --tags --abbrev=0
 })();
 
