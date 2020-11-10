@@ -96,7 +96,7 @@ function showReleaseInfo() {
 
   const repo = github.getRepo(process.env.GITHUB_REPO_USER, process.env.GITHUB_REPO);
   console.log(repo);
-  const release = await repo.createRelease({tag_name: `v${package.version}`, body: info.logs.join('\n')});
+  const release = await repo.createRelease({tag_name: `v${package.version}`, body: info.logs..map(it => it.message).join('\n')});
   console.log(release.data);
 
   // TODO: upload release artifact (if any)
