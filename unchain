@@ -72,9 +72,9 @@ function showReleaseInfo() {
   console.log(`new version: ${version}`);
 
   package.version = version;
-  if (args.run) {
+  // if (args.run) {
     fs.writeFileSync('package.json', `${JSON.stringify(package, null, 2)}\n`);
-  }
+  // }
 
   // TODO: add all, commit with version message, push including tags
   const fred = await git
