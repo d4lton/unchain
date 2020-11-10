@@ -1,15 +1,23 @@
 #!/usr/bin/env node
 
+require('dotenv').config();
 const args = require('minimist')(process.argv.slice(2));
 const fetch = require('node-fetch');
 const fs = require('fs');
 const git = require('simple-git')();
+const GitHub = require('github-api');
 const package = require('./package.json');
 const semver = require('semver');
+const btoa = require('btoa');
 
 const branches = args.branches || ['main', 'master', 'develop'];
 const run = args.run !== undefined ? args.run : false;
 
+const github = new GitHub({
+   username: process.env.GITHUB_USERNAME,
+   token: process.env.GITHUB_TOKEN
+});
+console.log(github.getUser());
 
 function usage(message) {
   if (message && !run) { return console.log(message) }
@@ -73,11 +81,10 @@ function showReleaseInfo() {
   console.log(`new version: ${version}`);
 
   package.version = version;
-  // if (args.run) {
+  if (args.run) {
     fs.writeFileSync('package.json', `${JSON.stringify(package, null, 2)}\n`);
-  // }
+  }
 
-  // TODO: add all, commit with version message, push including tags
   await git
     .add('package.json')
     .commit(`version ${package.version}`)
@@ -87,7 +94,10 @@ function showReleaseInfo() {
 
   // TODO: create github release
 
-// curl -X POST -u d4lton:de074499351fea159fe82e7a8003fef1b3d86cfe -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/d4lton/unchain/releases -d '{"tag_name":"v1.0.11","body":"these\nare the changes"}'
+  const repo = github.getRepo(process.env.GITHUB_REPO_USER, process.env.GITHUB_REPO);
+  console.log(repo);
+  const release = await repo.createRelease({tag_name: `v${package.version}`, body: info.logs.join('\n')});
+  console.log(release.data);
 
   // TODO: upload release artifact (if any)
 
