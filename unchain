@@ -13,11 +13,7 @@ const btoa = require('btoa');
 const branches = args.branches || ['main', 'master', 'develop'];
 const run = args.run !== undefined ? args.run : false;
 
-const github = new GitHub({
-   username: process.env.GITHUB_USERNAME,
-   token: process.env.GITHUB_TOKEN
-});
-console.log(github.getUser());
+const github = new GitHub({username: process.env.GITHUB_USERNAME, token: process.env.GITHUB_TOKEN});
 
 function usage(message) {
   if (message && !run) { return console.log(message) }
@@ -83,8 +79,11 @@ function showReleaseInfo() {
   package.version = version;
   if (args.run) {
 
+    console.log('updating package.json...');
+
     fs.writeFileSync('package.json', `${JSON.stringify(package, null, 2)}\n`);
 
+    console.log('committing changes and tagging release...');
     await git
       .add('package.json')
       .commit(`version ${package.version}`)
@@ -92,8 +91,7 @@ function showReleaseInfo() {
       .push()
       .pushTags()
 
-    // TODO: create github release
-
+    console.log('creating github release...');
     const repo = github.getRepo(process.env.GITHUB_REPO_USER, process.env.GITHUB_REPO);
     console.log(repo);
     const release = await repo.createRelease({tag_name: `v${package.version}`, body: info.logs.map(it => it.message).join('\n')});
@@ -103,8 +101,9 @@ function showReleaseInfo() {
     if (args.asset) {
     }
 
-  }
+    console.log('done.');
 
+  }
 
 })();
 
