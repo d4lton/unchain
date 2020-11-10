@@ -83,6 +83,7 @@ function showReleaseInfo() {
   console.log(fred);
 
   const larry = await git.tag('test')
+  console.log(larry);
 
   // TODO: create github release
 
