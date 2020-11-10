@@ -24,7 +24,8 @@ function usage(message) {
   console.log('');
   console.log('  options:');
   console.log('');
-  console.log('    --run | actually perform the release');
+  console.log('    --run          | actually perform the release');
+  console.log('    --asset <path> | include an asset in the release');
   console.log('');
   process.exit(1);
 }
@@ -85,6 +86,8 @@ function showReleaseInfo() {
     .pushTags()
 
   // TODO: create github release
+
+// curl -X POST -u d4lton:de074499351fea159fe82e7a8003fef1b3d86cfe -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/d4lton/unchain/releases -d '{"tag_name":"v1.0.11","body":"these\nare the changes"}'
 
   // TODO: upload release artifact (if any)
 
