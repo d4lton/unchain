@@ -36,11 +36,14 @@ function usage(message) {
   const branch = await git.branch();
   if (!branches.includes(branch.current)) { usage(`must be on one of these branches: ${branches.join(', ')}`) }
 
+  const stuff = await git.fetch();
+
   const status = await git.status();
   console.log(status);
   if (status.ahead || status.behind || status.staged.length || status.files.length) { usage(`branch is not clean`) }
 
   const tags = await git.tags();
+  console.log(tags);
 
   console.log(tags.latest);
   const logs = await git.log({from: tags.latest, to: 'HEAD'});
