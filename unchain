@@ -93,12 +93,13 @@ function showReleaseInfo() {
 
     console.log('creating github release...');
     const repo = github.getRepo(process.env.GITHUB_REPO_USER, process.env.GITHUB_REPO);
-    console.log(repo);
     const release = await repo.createRelease({tag_name: `v${package.version}`, body: info.logs.map(it => it.message).join('\n')});
     console.log(release.data);
 
     // TODO: upload release artifact (if any)
     if (args.asset) {
+      console.log(`assets_url: ${release.data.assets_url}`);
+      console.log(`upload_url: ${release.data.upload_url}`);
     }
 
     console.log('done.');
