@@ -77,13 +77,12 @@ function showReleaseInfo() {
   // }
 
   // TODO: add all, commit with version message, push including tags
-  const fred = await git
-    .add('.')
-    .commit(`version ${package.version}`);
-  console.log(fred);
-
-  const larry = await git.tag('test')
-  console.log(larry);
+  await git
+    .add('package.json')
+    .commit(`version ${package.version}`)
+    .addAnnotatedTag(`v${package.version}`, `version ${package.version}`)
+    .push()
+    .pushTags()
 
   // TODO: create github release
 
