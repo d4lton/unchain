@@ -5,18 +5,14 @@ const fetch = require('node-fetch');
 const fs = require('fs');
 const git = require('simple-git')();
 const package = require('./package.json');
+const semver = require('semver');
 
-const branches = ['main', 'master', 'develop'];
+const branches = args.branches || ['main', 'master', 'develop'];
+const run = args.run !== undefined ? args.run : false;
 
-// TODO: make sure branch is develop or master (configurable)
-// TODO: make sure branch is clean
-// TODO: determine what changed since last tag
-// TODO: update version
-// TODO: push changes, including tags, with version number as message
-// TODO: create github release
-// TODO: upload release artifact (if any)
 
 function usage(message) {
+  if (message && !run) { return console.log(message) }
   console.log('');
   console.log(`${package.name} v${package.version}`);
   console.log('');
@@ -24,28 +20,70 @@ function usage(message) {
     console.log(`  ${message}`);
     console.log('');
   }
-  console.log('usage: unchain');
+  console.log('usage: unchain [options]');
+  console.log('');
+  console.log('  options:');
+  console.log('');
+  console.log('    --run | actually perform the release');
   console.log('');
   process.exit(1);
 }
 
-(async () => {
-
-  await git.init();
+async function preflight() {
+  const results = {};
 
   const branch = await git.branch();
   if (!branches.includes(branch.current)) { usage(`must be on one of these branches: ${branches.join(', ')}`) }
 
-  const stuff = await git.fetch();
+  await git.fetch();
 
   const status = await git.status();
   if (status.ahead || status.behind || status.staged.length || status.files.length) { usage(`branch is not clean`) }
 
   const tags = await git.tags();
   if (!tags.latest) { usage(`could not determine latest tag`) }
+  results.tag = tags.latest;
 
   const logs = await git.log({from: tags.latest, to: 'HEAD'});
-  console.log(logs.all.map(it => it.message));
+  if (logs.all.length === 0) { usage(`no commits since last release`) }
+  results.logs = logs.all;
+
+  return results;
+}
+
+function showReleaseInfo() {
+}
+
+(async () => {
+
+  if (args.help) { usage() }
+
+  await git.init();
+
+  const info = await preflight();
+
+  console.log(`current version: ${package.version}`);
+  console.log(`latest tag: ${info.tag}`);
+
+  console.log('Release Notes:');
+  info.logs.map(log => { console.log(`  ${log.message}`) });
+
+  const version = semver.inc(package.version, 'patch');
+  console.log(`new version: ${version}`);
+
+  package.version = version;
+  if (args.run) {
+    fs.writeFileSync('package.json', `${JSON.stringify(package, null, 2)}\n`);
+  }
+
+  // TODO: add all, commit with version message, push including tags
+  git
+    .add('.')
+    .commit(`version ${package.version}`);
+
+  // TODO: create github release
+
+  // TODO: upload release artifact (if any)
 
 })();
 
