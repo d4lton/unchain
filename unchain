@@ -82,24 +82,29 @@ function showReleaseInfo() {
 
   package.version = version;
   if (args.run) {
+
     fs.writeFileSync('package.json', `${JSON.stringify(package, null, 2)}\n`);
+
+    await git
+      .add('package.json')
+      .commit(`version ${package.version}`)
+      .addAnnotatedTag(`v${package.version}`, `version ${package.version}`)
+      .push()
+      .pushTags()
+
+    // TODO: create github release
+
+    const repo = github.getRepo(process.env.GITHUB_REPO_USER, process.env.GITHUB_REPO);
+    console.log(repo);
+    const release = await repo.createRelease({tag_name: `v${package.version}`, body: info.logs.map(it => it.message).join('\n')});
+    console.log(release.data);
+
+    // TODO: upload release artifact (if any)
+    if (args.asset) {
+    }
+
   }
 
-  await git
-    .add('package.json')
-    .commit(`version ${package.version}`)
-    .addAnnotatedTag(`v${package.version}`, `version ${package.version}`)
-    .push()
-    .pushTags()
-
-  // TODO: create github release
-
-  const repo = github.getRepo(process.env.GITHUB_REPO_USER, process.env.GITHUB_REPO);
-  console.log(repo);
-  const release = await repo.createRelease({tag_name: `v${package.version}`, body: info.logs.map(it => it.message).join('\n')});
-  console.log(release.data);
-
-  // TODO: upload release artifact (if any)
 
 })();
 
