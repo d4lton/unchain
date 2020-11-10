@@ -39,13 +39,11 @@ function usage(message) {
   const stuff = await git.fetch();
 
   const status = await git.status();
-  console.log(status);
   if (status.ahead || status.behind || status.staged.length || status.files.length) { usage(`branch is not clean`) }
 
   const tags = await git.tags();
-  console.log(tags);
+  if (!tags.latest) { usage(`could not determine latest tag`) }
 
-  console.log(tags.latest);
   const logs = await git.log({from: tags.latest, to: 'HEAD'});
   console.log(logs.all.map(it => it.message));
 
