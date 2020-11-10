@@ -1,0 +1,24 @@
+#!/usr/bin/env node
+
+const fetch = require('node-fetch');
+const fs = require('fs');
+const git = require('simple-git')();
+const package = require('./package.json');
+
+// TODO: make sure branch is develop or master (configurable)
+// TODO: make sure branch is clean
+// TODO: determine what changed since last tag
+// TODO: update version
+// TODO: push changes, including tags, with version number as message
+// TODO: create github release
+// TODO: upload release artifact (if any)
+
+(async () => {
+  console.log('hi');
+  await git.init();
+  const stuff = await git.tags();
+  console.log(stuff);
+
+// git describe --tags --abbrev=0
+})();
+
